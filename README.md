@@ -40,36 +40,14 @@ Welcome to Lesson 14! This lesson is all about RSpec's collection and attribute 
 
 ## Detailed Examples & Output
 
-### include matcher
+### include matcher (Library domain)
 
-Analogy: `include` is like checking if an item is on your shopping list. You don’t care about the order or what else is there—just that the item is present.
+Analogy: `include` is like checking if a book is on your library shelf. You don’t care about the order or what else is there—just that the book is present.
 
 ```ruby
-# /spec/include_matcher_spec.rb
-RSpec.describe "include matcher" do
-  context "with arrays" do
-    it "checks for inclusion in an array" do
-      expect([1, 2, 3]).to include(2)
-      expect([1, 2, 3]).to include(1, 3)
-    end
-  end
-
-  context "with hashes" do
-    it "checks for inclusion in a hash (by key)" do
-      expect({a: 1, b: 2}).to include(:a)
-      expect({a: 1, b: 2}).to include(:a, :b)
-    end
-    it "checks for inclusion in a hash (by key-value pair)" do
-      expect({a: 1, b: 2}).to include(a: 1)
-    end
-  end
-
-  context "with strings" do
-    it "checks for inclusion in a string" do
-      expect("RSpec is fun").to include("RSpec")
-      expect("RSpec is fun").to include("is", "fun")
-    end
-  end
+# /spec/collection_spec.rb
+it 'includes a book with a specific title' do
+  expect(library.titles).to include("Ruby 101")
 end
 ```
 
@@ -82,33 +60,24 @@ include matcher
   checks for inclusion in a string
 
 Finished in 0.01 seconds (files took 0.1 seconds to load)
+
 3 examples, 0 failures
 ```
 
 ---
 
-### contain_exactly & match_array
+### contain_exactly & match_array (Library domain)
 
-Analogy: `contain_exactly` is like checking your grocery basket against a recipe—do you have all the right ingredients, no extras, and you don’t care about the order? `eq` would care about the order, but `contain_exactly` does not.
-
-`contain_exactly` and `match_array` are functionally the same, but `contain_exactly` takes a list of arguments, while `match_array` takes a single array. Use whichever reads better for your test.
+Analogy: `contain_exactly` is like checking your library’s catalog—do you have all the right books, no extras, and you don’t care about the order?
 
 ```ruby
-# /spec/contain_exactly_match_array_spec.rb
-RSpec.describe "contain_exactly & match_array" do
-  it "checks for exact contents, any order" do
-    expect([1, 2, 3]).to contain_exactly(3, 2, 1)
-    expect([1, 2, 3]).to match_array([3, 2, 1])
-  end
+# /spec/collection_spec.rb
+it 'contains exactly the right titles, any order' do
+  expect(library.titles).to contain_exactly("Ruby 101", "RSpec Mastery", "Gardening Basics")
+end
 
-  it "fails if an element is missing or extra" do
-    expect([1, 2, 3]).not_to contain_exactly(1, 2) # missing 3
-    expect([1, 2, 3]).not_to match_array([1, 2, 3, 4]) # extra 4
-  end
-
-  it "works with nested arrays" do
-    expect([[1, 2], [3, 4]]).to contain_exactly([3, 4], [1, 2])
-  end
+it 'matches array of tags for a book, order does not matter' do
+  expect(book1.tags).to match_array(["beginner", "ruby"])
 end
 ```
 
@@ -127,24 +96,18 @@ Finished in 0.01 seconds (files took 0.1 seconds to load)
 
 ---
 
-### start_with & end_with
+### start_with & end_with (Library domain)
 
-Analogy: `start_with` and `end_with` are like checking if a book starts with a certain chapter or ends with a specific epilogue. Order matters at the beginning or end.
+Analogy: `start_with` and `end_with` are like checking if your library’s genres start with “Programming” and end with “Outdoors.”
 
 ```ruby
-# /spec/start_end_matchers_spec.rb
-RSpec.describe "start_with & end_with" do
-  it "checks start and end of a string" do
-    expect("RSpec is great").to start_with("RSpec")
-    expect("RSpec is great").to end_with("great")
-  end
+# /spec/collection_spec.rb
+it 'starts with the first two genres for a book' do
+  expect(book2.genres).to start_with("Programming", "Testing")
+end
 
-  it "checks start and end of an array" do
-    expect([1, 2, 3]).to start_with(1)
-    expect([1, 2, 3]).to end_with(3)
-    expect([1, 2, 3]).to start_with(1, 2)
-    expect([1, 2, 3]).to end_with(2, 3)
-  end
+it 'ends with the last two genres in the library genres list' do
+  expect(library.genres).to end_with("Hobby", "Outdoors")
 end
 ```
 
@@ -161,34 +124,22 @@ Finished in 0.01 seconds (files took 0.1 seconds to load)
 
 ---
 
-### have_attributes matcher
+### have_attributes matcher (Library domain)
 
-Analogy: `have_attributes` is like checking a character sheet in a game—does your object have the right stats?
-
-This matcher is especially useful for model instances or objects with many attributes, letting you check several at once instead of writing multiple expectations.
+Analogy: `have_attributes` is like checking a book’s details—does it have the right title, author, and page count?
 
 ```ruby
-# /spec/have_attributes_spec.rb
-RSpec.describe "have_attributes matcher" do
-  it "checks object attributes" do
-    user = OpenStruct.new(name: "Alice", age: 30)
-    expect(user).to have_attributes(name: "Alice", age: 30)
-  end
+# /spec/collection_spec.rb
+it 'has attributes for a book' do
+  expect(book1).to have_attributes(title: "Ruby 101", author: "Alice", pages: 200)
+end
 
-  it "fails if an attribute is missing or wrong" do
-    user = OpenStruct.new(name: "Bob", age: 25)
-    expect(user).not_to have_attributes(name: "Alice")
-  end
+it 'finds all books by a specific author' do
+  expect(library.find_by_author("Alice")).to all(have_attributes(author: "Alice"))
+end
 
-  it "works with extra attributes present" do
-    user = OpenStruct.new(name: "Alice", age: 30, admin: true)
-    expect(user).to have_attributes(name: "Alice") # ignores extra attributes
-  end
-
-  it "fails if a required attribute is missing" do
-    user = OpenStruct.new(age: 30)
-    expect(user).not_to have_attributes(name: "Alice")
-  end
+it 'checks that all books have more than 100 pages' do
+  expect(library.books).to all(have_attributes(pages: be > 100))
 end
 ```
 
@@ -205,15 +156,22 @@ Finished in 0.01 seconds (files took 0.1 seconds to load)
 4 examples, 0 failures
 ```
 
-**Failed Example Output:**
+```ruby
+# /spec/collection_spec.rb
+it 'fails if a book is missing a required attribute (pending)' do
+  pending("Student: Implement a test for missing attribute using have_attributes")
+  raise "Unimplemented pending spec"
+end
 
-If you expect an attribute that is missing or wrong, you’ll see a failure like:
+it 'is pending: test for exact genres in a book (student to implement)' do
+  pending("Student: Write a test using contain_exactly for genres")
+  raise "Unimplemented pending spec"
+end
 
-```shell
-Failure/Error: expect(user).to have_attributes(name: "Alice")
-
-  expected #<OpenStruct age=30> to have attributes {:name=>"Alice"}
-       but had attributes {:age=>30}
+it 'checks that a book has extra attributes present' do
+  book = Book.new(title: "Extra", author: "Eve", genres: ["Fiction"], pages: 150, published_year: 2021, tags: ["fun", "short"])
+  expect(book).to have_attributes(title: "Extra")
+end
 ```
 
 ---
@@ -222,6 +180,7 @@ Failure/Error: expect(user).to have_attributes(name: "Alice")
 
 - Use `include` for checking presence of elements/keys/values in collections or substrings in strings.
 - Use `contain_exactly` or `match_array` when you care about the exact contents but not the order. (If order matters, use `eq`.)
+
 - Use `start_with`/`end_with` for strings or arrays when order matters at the beginning or end.
 - Use `have_attributes` for objects with multiple attributes you want to check at once, especially for model instances or complex objects.
 
@@ -236,21 +195,41 @@ Failure/Error: expect(user).to have_attributes(name: "Alice")
 
 ---
 
-## Practice Prompts
+---
 
-Try these exercises to reinforce your learning. For each, write your own spec in the appropriate file (e.g., `/spec/include_matcher_spec.rb`).
+## Hands-On Student Instructions
 
-**Exercise 1: include and contain_exactly with arrays and hashes**
-Write specs using `include` and `contain_exactly` for arrays and hashes. Try with nested arrays or hashes as well.
+This lesson repo is set up for you to get hands-on practice with RSpec's collection and attribute matchers using a real Ruby domain (Library/Book). To get started:
 
-**Exercise 2: have_attributes with custom objects**
-Write specs using `have_attributes` for custom objects. Test both passing and failing cases (e.g., missing or extra attributes).
+1. **Fork and Clone** this repository to your own GitHub account and local machine.
+2. **Install dependencies:**
 
-**Exercise 3: start_with and end_with for strings and arrays**
-Write specs using `start_with` and `end_with` for strings and arrays. Try with multiple elements and edge cases (e.g., empty arrays).
+    ```sh
+    bundle install
+    ```
 
-**Exercise 4: Failure scenarios**
-Write a spec that intentionally fails using one of the matchers above. What does the failure message tell you?
+3. **Run the specs:**
+
+    ```sh
+    bin/rspec
+    ```
+
+4. **Explore the code:**
+
+   - The main domain code is in `lib/library.rb`.
+   - The robust example specs are in `spec/collection_spec.rb`.
+
+5. **Implement the pending specs:**
+
+   - There are at least two pending specs marked with `pending` in `spec/collection_spec.rb`.
+   - Your task: Remove the `pending` line and implement the expectation so the spec passes.
+
+6. **Experiment:**
+
+   - Try adding your own examples using the matchers covered in this lesson.
+   - Make the specs fail on purpose to see the error messages and learn from them.
+
+All specs should pass except the pending ones. When you finish, all specs should be green!
 
 ---
 
