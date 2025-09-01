@@ -1,6 +1,6 @@
 # RSpec: Collection & Attribute Matchers
 
-Welcome to Lesson 14! This lesson is all about RSpec's collection and attribute matchers—tools that let you write expressive, readable specs for arrays, hashes, sets, and objects with attributes. These matchers help you check if a collection contains certain elements, if it matches exactly, if an object has specific attributes, or if a string/array starts or ends with something. We'll cover what they are, why they're useful, when to use each, and show you lots of examples (with output) so you can see them in action.
+This lesson is all about RSpec's collection and attribute matchers—tools that let you write expressive, readable specs for arrays, hashes, sets, and objects with attributes. These matchers help you check if a collection contains certain elements, if it matches exactly, if an object has specific attributes, or if a string/array starts or ends with something. We'll cover what they are, why they're useful, when to use each, and show you lots of examples (with output) so you can see them in action.
 
 ---
 
